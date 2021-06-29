@@ -1,0 +1,2 @@
+rootProject.name = "Feed video player"
+include ':app'
