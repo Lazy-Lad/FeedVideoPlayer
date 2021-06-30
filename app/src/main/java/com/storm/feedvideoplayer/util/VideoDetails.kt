@@ -24,6 +24,7 @@ fun Context.jsonFileToList(fileName: String): List<VideoDetailModel>?{
                 jsonObj.getString("subtitle"),
                 jsonObj.getString("thumb"),
                 jsonObj.getString("title"),
+                jsonObj.getString("profileImg")
             )
             videoList.add(videoDetailModel)
         }

@@ -7,5 +7,6 @@
     <string name="publisher_name">Publisher name</string>
     <string name="expand_text_button">Expand text button</string>
     <string name="video_url">Video Url</string>
-    <string name="feed">Feed</string>
+    <string name="feed">Video feed</string>
+    <string name="sound">sound</string>
 </resources>

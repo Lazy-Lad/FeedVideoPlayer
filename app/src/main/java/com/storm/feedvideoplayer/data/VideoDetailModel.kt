@@ -5,5 +5,6 @@ data class VideoDetailModel(
     val sources:String,
     val subtitle: String,
     val thumb: String,
-    val title: String
+    val title: String,
+    val profileImg:String
 )
