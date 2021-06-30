@@ -9,4 +9,5 @@
     <string name="video_url">Video Url</string>
     <string name="feed">Video feed</string>
     <string name="sound">sound</string>
+    <string name="retry">retry</string>
 </resources>

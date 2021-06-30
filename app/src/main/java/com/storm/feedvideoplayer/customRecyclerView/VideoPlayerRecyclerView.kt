@@ -1,6 +1,8 @@
 package com.storm.feedvideoplayer.customRecyclerView
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -8,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.annotation.Nullable
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +37,7 @@ class VideoPlayerRecyclerView(
     private var isMuted: Boolean = false
     private var thumbnail: ImageView? = null
     private lateinit var soundIndicator: ImageView
+    private lateinit var retryBtn: ImageView
     private var progressBar: ProgressBar? = null
     private var viewHolderParent: View? = null
     private var frameLayout: FrameLayout? = null
@@ -145,6 +147,7 @@ class VideoPlayerRecyclerView(
         thumbnail = holder.thumbnail
         progressBar = holder.progressBar
         soundIndicator = holder.itemView.findViewById(R.id.soundIndicator)
+        retryBtn = holder.itemView.findViewById(R.id.retryImg)
         requestManager = holder.requestManager
         frameLayout = holder.itemView.findViewById(R.id.media_container)
 
@@ -179,6 +182,7 @@ class VideoPlayerRecyclerView(
                 when (state) {
                     Player.STATE_BUFFERING -> {
                         Log.d("VideoPlay", "STATE_BUFFERING")
+                        retryBtn.visibility = GONE
                         if (progressBar != null) {
                             progressBar!!.visibility = VISIBLE
                         }
@@ -188,6 +192,12 @@ class VideoPlayerRecyclerView(
                     }
                     Player.STATE_IDLE -> {
                         Log.d("VideoPlay", "STATE_IDLE")
+                        // show retry on video load failure
+                        progressBar!!.visibility = GONE
+                        retryBtn.visibility = VISIBLE
+                        retryBtn.setOnClickListener {
+                            videoPlayer!!.prepare()
+                        }
                     }
                     Player.STATE_READY -> {
                         Log.d("VideoPlay", "STATE_READY")

@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
         val videoList = jsonFileToList("videoDetails.json")
         Log.d("JSON_FILE", videoList?.get(0)!!.toString())
         if (videoList.isNotEmpty()) {
-
             adapter = VideoPlayerRecyclerViewAdapter(videoList,initGlide())
             binding.recyclerView.layoutManager = LinearLayoutManager(this)
             binding.recyclerView.videoList = videoList
