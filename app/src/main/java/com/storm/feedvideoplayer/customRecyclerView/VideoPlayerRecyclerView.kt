@@ -32,9 +32,17 @@ class VideoPlayerRecyclerView(
     @Nullable attrs: AttributeSet?
 ) : RecyclerView(context, attrs) {
 
+    // functional vars
     private var ctx: Context = context.applicationContext
     var videoList: List<VideoDetailModel>? = null
+    private var videoSurfaceDefaultHeight = 0
+    private var screenDefaultHeight = 0
+    private var playPosition = -1
+    private var isVideoViewAdded = false
+    private var playbackPosition: Long = 0
     private var isMuted: Boolean = false
+
+    // UI vars
     private var thumbnail: ImageView? = null
     private lateinit var soundIndicator: ImageView
     private lateinit var retryBtn: ImageView
@@ -43,18 +51,15 @@ class VideoPlayerRecyclerView(
     private var frameLayout: FrameLayout? = null
     private var videoSurfaceView: PlayerView
     private var videoPlayer: SimpleExoPlayer?
-    private var videoSurfaceDefaultHeight = 0
-    private var screenDefaultHeight = 0
-    private var playPosition = -1
-    private var isVideoViewAdded = false
-    private var playbackPosition: Long = 0
     private lateinit var requestManager:RequestManager
 
 
     init {
+        // get screen size for display
         val display = this.resources.displayMetrics
         val width = display.widthPixels
         val height = display.heightPixels
+        //this is actually width of scree, assumption screen width is video view height
         videoSurfaceDefaultHeight = width
         screenDefaultHeight = height
         Log.d("Display", "$videoSurfaceDefaultHeight $screenDefaultHeight")
@@ -66,6 +71,10 @@ class VideoPlayerRecyclerView(
         videoSurfaceView.useController = false
         videoSurfaceView.player = videoPlayer
 
+
+        // listen for scrolling events on recycler view and play the video when scrolling stops
+        // if any video is playing prior to scrolling then keep playing that video until scrolling
+        // stops to change video
         addOnScrollListener(object : OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -73,6 +82,8 @@ class VideoPlayerRecyclerView(
                     if(thumbnail != null){
                         thumbnail!!.visibility = VISIBLE
                     }
+
+                    // check if page reached end if yes play end video
                     if (!recyclerView.canScrollVertically(1)) {
                         playVideo(true)
                     }else {
@@ -83,6 +94,8 @@ class VideoPlayerRecyclerView(
 
         })
 
+
+        // this piece of code decides what to do when view gets attached to parent
         addOnChildAttachStateChangeListener(object : OnChildAttachStateChangeListener {
             override fun onChildViewAttachedToWindow(view: View) {
 //                TODO("Not yet implemented")
@@ -142,6 +155,8 @@ class VideoPlayerRecyclerView(
         val currentPosition =
             targetPosition - (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
         Log.d("currentPosition","$currentPosition")
+
+        // Bind data to view to perform play video
         val child = getChildAt(currentPosition) ?: return
         val holder = child.tag as VideoPlayerViewHolder
         thumbnail = holder.thumbnail
@@ -151,6 +166,8 @@ class VideoPlayerRecyclerView(
         requestManager = holder.requestManager
         frameLayout = holder.itemView.findViewById(R.id.media_container)
 
+
+        // Exo player data binding code starts
         videoSurfaceView.player = videoPlayer
         val mediaUrl: String = videoList!![targetPosition].sources
         val mediaSource = buildMediaSource(mediaUrl)
@@ -161,6 +178,7 @@ class VideoPlayerRecyclerView(
         videoPlayer!!.prepare()
         playBackEventListener()
 
+        //handle tap event to mute and un-mute playing video
         holder.itemView.setOnClickListener {
             if(!isMuted){
                 videoPlayer!!.volume = 0f
@@ -175,6 +193,7 @@ class VideoPlayerRecyclerView(
 
     }
 
+    // check for video playing state (self explanatory function)
     private fun playBackEventListener() {
         videoPlayer!!.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(state: Int) {
@@ -192,7 +211,7 @@ class VideoPlayerRecyclerView(
                     }
                     Player.STATE_IDLE -> {
                         Log.d("VideoPlay", "STATE_IDLE")
-                        // show retry on video load failure
+                        // show retry button on video load failure
                         progressBar!!.visibility = GONE
                         retryBtn.visibility = VISIBLE
                         retryBtn.setOnClickListener {
@@ -265,6 +284,9 @@ class VideoPlayerRecyclerView(
         videoPlayer!!.pause()
     }
 
+    // Determine playing video height
+    // Assumption :- screen hold two video only, even if there are more than two code ensures,
+    // it remains two for deciding which one to play
     private fun getVisibleVideoSurfaceHeight(playPosition: Int): Int {
         val at =
             playPosition - (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
@@ -280,9 +302,7 @@ class VideoPlayerRecyclerView(
         }
     }
 
-
-
-
+    // just to animate sound indicator.
     private fun animateVolumeControl() {
         soundIndicator.bringToFront()
         if (isMuted) {

@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         view = binding.root
         setContentView(view)
+
         val videoList = jsonFileToList("videoDetails.json")
         Log.d("JSON_FILE", videoList?.get(0)!!.toString())
         if (videoList.isNotEmpty()) {
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
             binding.recyclerView.videoList = videoList
             binding.recyclerView.adapter = adapter
         } else {
-            Toast.makeText(this, "We don't have data right now.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "We don't have any data right now.", Toast.LENGTH_SHORT).show()
         }
     }
 
