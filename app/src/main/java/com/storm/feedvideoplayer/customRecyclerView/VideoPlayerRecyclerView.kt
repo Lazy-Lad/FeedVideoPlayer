@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.annotation.Nullable
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -81,6 +82,9 @@ class VideoPlayerRecyclerView(
                 if (newState == SCROLL_STATE_IDLE) {
                     if(thumbnail != null){
                         thumbnail!!.visibility = VISIBLE
+                    }
+                    if(progressBar != null){
+                        progressBar!!.visibility = GONE
                     }
 
                     // check if page reached end if yes play end video
@@ -165,7 +169,7 @@ class VideoPlayerRecyclerView(
         retryBtn = holder.itemView.findViewById(R.id.retryImg)
         requestManager = holder.requestManager
         frameLayout = holder.itemView.findViewById(R.id.media_container)
-
+        progressBar?.visibility= VISIBLE
 
         // Exo player data binding code starts
         videoSurfaceView.player = videoPlayer
@@ -175,8 +179,9 @@ class VideoPlayerRecyclerView(
         videoPlayer!!.repeatMode = Player.REPEAT_MODE_ALL
         videoPlayer!!.seekTo(playbackPosition)
         videoPlayer!!.setMediaSource(mediaSource)
-        videoPlayer!!.prepare()
         playBackEventListener()
+        videoPlayer!!.prepare()
+
 
         //handle tap event to mute and un-mute playing video
         holder.itemView.setOnClickListener {
@@ -202,9 +207,7 @@ class VideoPlayerRecyclerView(
                     Player.STATE_BUFFERING -> {
                         Log.d("VideoPlay", "STATE_BUFFERING")
                         retryBtn.visibility = GONE
-                        if (progressBar != null) {
-                            progressBar!!.visibility = VISIBLE
-                        }
+                        progressBar!!.visibility = VISIBLE
                     }
                     Player.STATE_ENDED -> {
                         Log.d("VideoPlay", "STATE_ENDED")
@@ -212,7 +215,9 @@ class VideoPlayerRecyclerView(
                     Player.STATE_IDLE -> {
                         Log.d("VideoPlay", "STATE_IDLE")
                         // show retry button on video load failure
-                        progressBar!!.visibility = GONE
+                        if(progressBar?.visibility == VISIBLE){
+                            progressBar!!.visibility = GONE
+                        }
                         retryBtn.visibility = VISIBLE
                         retryBtn.setOnClickListener {
                             videoPlayer!!.prepare()
@@ -220,14 +225,11 @@ class VideoPlayerRecyclerView(
                     }
                     Player.STATE_READY -> {
                         Log.d("VideoPlay", "STATE_READY")
-                        if (progressBar != null) {
-                            progressBar!!.visibility = GONE
-                        }
+                        progressBar!!.visibility = GONE
                         if (!isVideoViewAdded) {
                             addVideoView();
                         }
                     }
-
                 }
             }
         })
