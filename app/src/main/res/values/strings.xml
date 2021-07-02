@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Feed video player</string>
+    <string name="title_of_video">Title of Video</string>
+    <string name="video_description">The Smoking Tire meets up with Chris and Jorge from CarsForAGrand.com to see just how far $1,000 can go when looking for a car.The Smoking Tire meets up with Chris and Jorge from CarsForAGrand.com to see just how far $1,000 can go when looking for a car.</string>
+    <string name="author_profile_picture">Author profile picture</string>
+    <string name="video_thumbnail">video thumbnail</string>
+    <string name="publisher_name">Publisher name</string>
+    <string name="expand_text_button">Expand text button</string>
+    <string name="video_url">Video Url</string>
+    <string name="feed">Video feed</string>
+    <string name="sound">sound</string>
+    <string name="retry">retry</string>
 </resources>
